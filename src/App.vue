@@ -1,52 +1,48 @@
 <template>
     <div id="app">
-        <v-app id="vuefify-app">
-            <v-container fluid>
-                <div class="app__wrapper">
-                    <Navbar />
-                    <Navigation />
-                    <router-view />
-                </div>
-            </v-container>
+        <v-app>
+            <v-content v-if="loggedIn===null">
+                <v-container fill-height>
+                    <v-layout align-center justify-center>
+                        <v-flex>
+                            <div class="text-xs-center">
+                                <div class="headline my-5">Loading...</div>
+                                <v-progress-circular size="100" indeterminate color="primary"></v-progress-circular>
+                            </div>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+            </v-content>
+            <router-view v-else />
+            <NotificationsManager></NotificationsManager>
         </v-app>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Navbar from './generalComponents/Navbar.vue'
-import Navigation from './generalComponents/Navigation.vue'
 import {
-    mapGetters, mapMutations
-} from 'vuex'
+    Component, Vue
+} from 'vue-property-decorator'
+import NotificationsManager from '@/components/NotificationsManager.vue'
+import {
+    readIsLoggedIn
+} from '@/store/main/getters'
+import {
+    dispatchCheckLoggedIn
+} from '@/store/main/actions'
 
-export default Vue.extend({
-    name: 'App',
-    components: {
-        Navbar,
-        Navigation
-    },
-    created () {
-        this.setWindowWidth(window.innerWidth)
-        window.addEventListener('resize', this.activateWidthTrigger)
-    },
-
-    destroyed () {
-        window.removeEventListener('resize', this.activateWidthTrigger)
-    },
-
-    computed: {
-        ...mapGetters(['today', 'leftNavigationStatus', 'windowWidth', 'selectedLanguage'])
-    },
-
-    methods: {
-        ...mapMutations(['setWindowWidth']),
-
-        activateWidthTrigger () {
-            this.setWindowWidth(window.innerWidth)
-        }
+  @Component({
+      components: {
+          NotificationsManager
+      }
+  })
+export default class App extends Vue {
+    get loggedIn () {
+        return readIsLoggedIn(this.$store)
     }
-})
-</script>
 
-<style lang="scss" src="./styles/App.scss"></style>
+    public async created () {
+        await dispatchCheckLoggedIn(this.$store)
+    }
+}
+</script>

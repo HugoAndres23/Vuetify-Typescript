@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "noImplicitAny": false,
     "target": "es2019",
     "module": "commonjs",
+    "experimentalDecorators": true,
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,
